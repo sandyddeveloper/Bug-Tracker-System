@@ -16,8 +16,9 @@ class RegisterUserView(GenericAPIView):
             user=serializer.data
             send_code_to_user(user['email'])
             #save email function user['email']
+            print(user)
             return Response({
                 'data':user,
-                'message':f'hey {user.first_name} thanks for signing up a passcode'
+                'message':f'hey thanks for signing up a passcode'
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
