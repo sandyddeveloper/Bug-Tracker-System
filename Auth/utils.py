@@ -22,3 +22,5 @@ def send_code_to_user(email):
 
     d_email = EmailMessage(subject=Subject, body=email_boby, from_email=from_email, to=[email])
     d_email.send(fail_silently=True)
+
+
