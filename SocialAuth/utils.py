@@ -4,48 +4,56 @@ from Auth.models import User
 from django.contrib.auth import authenticate
 from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class Google():
     @staticmethod
     def validate(access_token):
         try:
-            id_info = id_token.verify_oauth2_token(access_token, requests.Request())
+            id_info = id_token.verify_oauth2_token(
+                access_token, requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
             if "accounts.google.com" in id_info['iss']:
                 return id_info
-        except Exception as e:
-            return "Token is invalid or has expired"
+        except Exception:
+            raise AuthenticationFailed("Token is invalid or has expired")
 
-def login_social_user(email, password):
-    user = authenticate(email=email, password=password)
-    user_token = user.token()
+
+
+def login_social_user(email):
+    user = User.objects.get(email=email)
+    refresh = RefreshToken.for_user(user)
+    
     return {
-        'email':user.email,
-        "full_name":user.get_full_name,
-        "access_token":str(user_token.get('access')),
-        "refresh_token":str(user_token.get('refresh'))
+        'email': user.email,
+        'full_name': f"{user.first_name} {user.last_name}",
+        'access_token': str(refresh.access_token),
+        'refresh_token': str(refresh)
     }
 
 
 def register_social_user(provider, email, first_name, last_name):
-    user=User.object.filter(email=email)
-    if user.exists():
-        if provider == user[0].auth_provider:
-            login_social_user(email, settings.SOCIAL_AUTH_PASSWORD)
-            
+    user = User.objects.filter(email=email).first()
+    
+    if user:
+        if provider == user.auth_provider:
+            return login_social_user(email)
         else:
             raise AuthenticationFailed(
-                detail=f'please continue you login with {user[0].auth_provider}'
+                detail=f'Please continue login with {user.auth_provider}'
             )
-    else:    
-        new_user={
-            'email':email,
-            'first_name':first_name,
-            'last_name': last_name,
-            'password': settings.SOCIAL_AUTH_PASSWORD
-        }
-        register_user = User.objects.create_user(**new_user)
-        register_user.auth_provider = provider
-        register_user.is_verified = True
-        register_user.save()
-        login_social_user(email=register_user.email, password=settings.SOCIAL_AUTH_PASSWORD)
+
+    user_data = {
+        'email': email,
+        'first_name': first_name,
+        'last_name': last_name,
+        'password': settings.SOCIAL_AUTH_PASSWORD
+    }
+    
+    new_user = User.objects.create_user(**user_data)
+    new_user.auth_provider = provider
+    new_user.is_verified = True
+    new_user.save()
+
+    return login_social_user(new_user.email)

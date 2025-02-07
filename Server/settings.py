@@ -72,13 +72,14 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",
-    "http://localhost:5173"
+    "http://localhost:5173",  
 ]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    "http://localhost:5173"
-]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*']
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None  # Prevents COOP from blocking postMessage
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Allow frontend domain
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
