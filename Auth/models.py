@@ -4,14 +4,21 @@ from django.utils.translation import gettext_lazy as _
 from .managers import UserManager
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
 # Create your models here.
 
 AUTH_PROVIDERS = {'email':'email', 'google':'google', 'github':'github'}
 
 class User(AbstractBaseUser, PermissionsMixin):
+    ROLE_CHOICES = [ 
+        ('developer', 'Developer'),
+        ('tester', 'Tester'),
+    ]
     email = models.EmailField(max_length=225, unique=True, verbose_name=_("Email Address"))
     first_name = models.CharField(max_length=100, verbose_name=_("First Name"))
     last_name = models.CharField(max_length=100, verbose_name=_("Last Name"))
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES,null=True, blank=True)
+    workspace = models.ForeignKey("Core.Workspace", on_delete=models.CASCADE, null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)

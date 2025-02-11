@@ -16,21 +16,32 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name', 'password', 'password_confirm']
+        fields = ['email', 'first_name', 'last_name', 'role','password', 'password_confirm']
 
     def validate(self, attrs):
         password = attrs.get('password', '')
         password_confirm = attrs.get('password_confirm', '')
         if password != password_confirm:
             raise serializers.ValidationError("Passowords do not match")
+        
+        role = attrs.get('role')
+        valid_roles = [choice[0] for choice in User.ROLE_CHOICES]
+        if role and role not in valid_roles:
+            raise serializers.ValidationError({"role": "Invalid role selected."})
+
         return attrs
+    
+    # Validate role choice
+        
+        
     
     def create(self, validated_data):
         user = User.objects.create_user(
             email=validated_data['email'],
             first_name=validated_data.get('first_name'),
             last_name=validated_data.get('last_name'),
-            password=validated_data.get('password')
+            password=validated_data.get('password'),
+            role=validated_data.get('role')
         )
         return user
     
