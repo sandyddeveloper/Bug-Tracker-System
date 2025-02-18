@@ -6,7 +6,7 @@ from django.conf import settings
 def generateOtp():
     otp=""
     for i in range(6):
-        otp += str(random.randint(1,9))
+        otp +=str(random.randint(1,9))
     return otp
 
 def send_code_to_user(email):

@@ -1,14 +1,19 @@
+import environ
 from pathlib import Path
-import os
 from datetime import timedelta
 
-
+env = environ.Env(
+    DEBUG=(bool,False)
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(BASE_DIR/ '.env')
 
-SECRET_KEY = 'django-insecure-^0et2=$cj14&h50=#lx#*o&ocov6*%q6yfgy&3tdhwga#b(8@5'
-DEBUG = True
+SECRET_KEY = env('SECRET_KEY')
+
+
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ["*"]
 
@@ -84,10 +89,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(seconds=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
-    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
-    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
 }
 
 DATABASES = {
@@ -133,15 +134,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_HOST_USER = '75c208fdc6f9f5'
+EMAIL_HOST_PASSWORD = '8a37a4c1ae8fe2'
 DEFAULT_FROM_EMAIL= 'santhoshrajk1812@gmail.com'
 EMAIL_PORT = '2525'
 EMAIL_USE_TLS=True
 
-GOOGLE_CLIENT_ID=os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET=os.getenv("GOOGLE_CLIENT_SECRET")
-SOCIAL_AUTH_PASSWORD=os.getenv("SOCIAL_AUTH_PASSWORD")
+
 
 
 JAZZMIN_SETTINGS = {
